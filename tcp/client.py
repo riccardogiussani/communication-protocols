@@ -1,6 +1,7 @@
 import socket
 
-HOST, PORT = '127.0.0.1', 8080
+HOST = '127.0.0.1'
+PORT = 8080
 
 with socket.socket() as s:
     s.connect((HOST, PORT))

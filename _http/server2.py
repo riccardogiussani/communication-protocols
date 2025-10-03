@@ -1,6 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.parse
-import json
+
+HOST = '127.0.0.1'
+PORT = 8080
 
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -8,12 +10,12 @@ class SimpleHandler(BaseHTTPRequestHandler):
         route = parsed_path.path
 
         if route == "/":
-            self.respond_text("Welcome to the Python HTTP server!")
-        elif route == "/greet":
-            self.respond_text("Hello World from the greeting endpoint!")
-        elif route == "/json":
-            data = {"message": "Hello from JSON endpoint", "status": "ok"}
-            self.respond_json(data)
+            # Construct response to send back
+            response = ""
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(response.encode())
         else:
             self.send_error(404, "Not Found")
 
@@ -25,35 +27,21 @@ class SimpleHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length).decode()
         params = urllib.parse.parse_qs(post_data)
 
-        if route == "/echo":
-            message = params.get("message", ["(no message)"])[0]
-            self.respond_text(f"Echo: {message}")
-        elif route == "/sum":
-            try:
-                a = int(params.get("a", [0])[0])
-                b = int(params.get("b", [0])[0])
-                result = {"a": a, "b": b, "sum": a + b}
-                self.respond_json(result)
-            except ValueError:
-                self.send_error(400, "Invalid numbers")
+        if route == "/my_api_endpoint":
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+
+            if(params.get("message") is None):
+                self.wfile.write(b"Did not receive any message.")
+            else:
+                message = params.get("message")
+                self.wfile.write(f"Received: {message}".encode())
         else:
             self.send_error(404, "Not Found")
 
-    # Helpers
-    def respond_text(self, text):
-        self.send_response(200)
-        self.send_header("Content-type", "text/plain")
-        self.end_headers()
-        self.wfile.write(text.encode())
-
-    def respond_json(self, data):
-        self.send_response(200)
-        self.send_header("Content-type", "application/json")
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
-
 if __name__ == "__main__":
-    server_address = ("localhost", 8080)
+    server_address = (HOST, PORT)
     httpd = HTTPServer(server_address, SimpleHandler)
-    print("Serving on http://localhost:8080")
+    print(f"HTTP server listening on http://{HOST}:{PORT}")
     httpd.serve_forever()

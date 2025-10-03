@@ -1,11 +1,14 @@
 import websocket 
 
-uri = "ws://127.0.0.1:8080"
+HOST = '127.0.0.1'
+PORT = 8080
 
+uri = f"ws://{HOST}:{PORT}"
 ws = websocket.create_connection(uri)
+
 ws.send("Hello from the WebSocket client.")
 
 reply = ws.recv()
-print("Received: ", reply)
+print(reply)
 
 ws.close()
