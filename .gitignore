@@ -1,4 +1,4 @@
-./venv/
+venv/
 
-./arduino_bridge.py
-./mqtt/client2.py
+arduino_bridge.py
+mqtt/client2.py
